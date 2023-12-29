@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:timer_f1/providers/timer_provider.dart';
 import 'package:timer_f1/routes/routes.dart';
 
 void main() async {
@@ -10,7 +11,7 @@ void main() async {
   /* Para evitar que se muestren los menus */
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
   
-  runApp(const MyApp());
+  runApp(const AppState());
 }
 
 class AppState extends StatelessWidget {
@@ -19,7 +20,9 @@ class AppState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [],
+      providers: [
+        ChangeNotifierProvider(create: (_) => TimerProvider()),
+      ],
       child: const MyApp(),
     );
   }

@@ -1,8 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import 'package:timer_f1/providers/timer_provider.dart';
 import 'package:timer_f1/utils/timer_text.dart';
+
+import '../utils/timer_format.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,69 +15,114 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Stopwatch time = Stopwatch();
-  
-  @override
-  void initState() {
-    super.initState();
-    // TODO: First
-  }
+  bool firstLap = true;
+  int timeCapture = 0;
+  bool delay = false;
   
   @override
   void dispose() {
     super.dispose();
-    // TODO: Last
+    time.stop();
   }
   
   @override
   Widget build(BuildContext context) {
-    void handleChangeTheme() {
-      if (time.isRunning) {
-        time.stop();
-        time.reset();
-      } else {
+    final timerProvider = Provider.of<TimerProvider>(context);
+    
+    void handleGo() async {
+      if (delay) return;
+      
+      if (firstLap) {
         time.start();
-      }
+        firstLap = false;
+      } else {
+        time.stop();
+        timeCapture = time.elapsedMilliseconds;
+        
+        setState(() {
+          delay = true;
+          time.reset();
+          time.start();
+        });
+        
+        timerProvider.saveTime(timeCapture);
+        
+        Future.delayed(const Duration(seconds: 3), () => {
+          setState(() {
+            delay = false;
+          })
+        });
+      } 
+    }
+    
+    void handleNavigate() {
+        
     }
     
     return Scaffold(
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: Stack(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
+              Column(
+                mainAxisSize: MainAxisSize.max,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    '01:20.021',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 50,
-                      fontFamily: GoogleFonts.dmMono().fontFamily,
-                      backgroundColor: Colors.green
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        TimerFormat.formatMilliseconds(timerProvider.lastLap),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 50,
+                          fontFamily: GoogleFonts.dmMono().fontFamily,
+                          backgroundColor: timerProvider.isLastLapFaster ? Colors.green : Colors.red 
+                        ),
+                      ),
+                      Text(
+                        TimerFormat.formatMilliseconds(timerProvider.fastestLap),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 50,
+                            fontFamily: GoogleFonts.dmMono().fontFamily,
+                            backgroundColor: Colors.purple,
+                            color: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    '01:20.021',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 50,
-                        fontFamily: GoogleFonts.dmMono().fontFamily,
-                        backgroundColor: Colors.purple,
-                        color: Colors.white,
-                    ),
-                  ),
+                  const Expanded(child: SizedBox()),
+                  !delay
+                    ? TimerText(stopwatch: time)
+                    : FittedBox(
+                        fit: BoxFit.contain,
+                        child: Text(
+                          TimerFormat.formatMilliseconds(timeCapture),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 50,
+                            letterSpacing: 2.0,
+                            fontFamily: GoogleFonts.dmMono().fontFamily
+                          ),
+                        ),
+                      ),
+                  const Expanded(child: SizedBox()),
                 ],
               ),
-              const Expanded(child: SizedBox()),
-              TimerText(stopwatch: time),
-              const Expanded(child: SizedBox()),
-            ],
+              Expanded(
+                child: GestureDetector(
+                  onTap: handleGo,
+                  onLongPress: handleNavigate,
+                ),
+              ),
+            ]
           ),
         ),
       ),
