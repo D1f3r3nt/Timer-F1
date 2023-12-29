@@ -7,6 +7,10 @@ class TimerProvider extends ChangeNotifier {
   int fastestLap = 0;
   int lastLap = 0;
   bool isLastLapFaster = true;
+
+  List<int> getLaps() {
+    return [..._times];
+  }
   
   void saveTime(int time) {
     _times.add(time);
