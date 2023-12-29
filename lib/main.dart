@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:timer_f1/routes/routes.dart';
-import 'package:timer_f1/utils/audio_click_handler.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  /* Para evitar que la pantalla se voltee */
+  SystemChrome.setPreferredOrientations([DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+  /* Para evitar que se muestren los menus */
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+  
   runApp(const MyApp());
 }
 

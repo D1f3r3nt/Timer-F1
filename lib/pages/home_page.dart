@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:timer_f1/utils/timer_text.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -11,6 +12,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  Stopwatch time = Stopwatch();
   
   @override
   void initState() {
@@ -27,7 +29,12 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     void handleChangeTheme() {
-      // TODO: Change theme
+      if (time.isRunning) {
+        time.stop();
+        time.reset();
+      } else {
+        time.start();
+      }
     }
     
     return Scaffold(
@@ -36,7 +43,7 @@ class _HomePageState extends State<HomePage> {
           padding: const EdgeInsets.all(8.0),
           child: Column(
             mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -46,24 +53,27 @@ class _HomePageState extends State<HomePage> {
                     '01:20.021',
                     textAlign: TextAlign.center,
                     style: TextStyle(
+                      fontWeight: FontWeight.bold,
                       fontSize: 50,
-                      fontFamily: GoogleFonts.orbitron().fontFamily
+                      fontFamily: GoogleFonts.dmMono().fontFamily,
+                      backgroundColor: Colors.green
                     ),
                   ),
-                  IconButton(onPressed: handleChangeTheme, icon: const Icon(Icons.sunny))
+                  Text(
+                    '01:20.021',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 50,
+                        fontFamily: GoogleFonts.dmMono().fontFamily,
+                        backgroundColor: Colors.purple,
+                        color: Colors.white,
+                    ),
+                  ),
                 ],
               ),
               const Expanded(child: SizedBox()),
-              Text(
-                '01:20.021',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 120,
-                  fontFamily: GoogleFonts.orbitron().fontFamily
-                ),
-              ),
+              TimerText(stopwatch: time),
               const Expanded(child: SizedBox()),
             ],
           ),
