@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:timer_f1/providers/timer_provider.dart';
 import 'package:timer_f1/utils/timer_text.dart';
 
+import '../utils/dialogs.dart';
 import '../utils/timer_format.dart';
 
 class HomePage extends StatefulWidget {
@@ -56,7 +57,13 @@ class _HomePageState extends State<HomePage> {
     }
     
     void handleNavigate() {
-        
+        showDialog(context: context, builder: (_) => sureDialog(
+            context: context,
+            confirm: () {
+              time.stop();
+              Navigator.pushReplacementNamed(context, 'history');
+            }
+        ));
     }
     
     return Scaffold(
